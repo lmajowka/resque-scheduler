@@ -31,17 +31,20 @@
         </form>
       </td>
       <td>
+        <% job = resque.delayed_timestamp_peek(timestamp, 0, 1).first %>
         <form action="<%= u "/delayed/edit" %>" id="edit-form" method="post">
           <a href="<%= u "delayed/#{timestamp}" %>"><%= format_time(Time.at(timestamp)) %></a>
           <input name="new_timestamp" id="ts<%= timestamp.to_i %>" style="display:none" type="text" value="<%= format_time(Time.at(timestamp)) %>"/>
           <input type="hidden" name="timestamp" value="<%= timestamp.to_i %>">
+          <% if job %>
           <input type="hidden" name="args" value="<%= Resque.encode job['args'] %>">
           <input type="hidden" name="klass" value="<%= job['class'] %>">
+          <% end %>
           <input type="hidden" name="new_args" id="new_args" value="<%= timestamp.to_i %>">
         </form>
       </td>
       <td><%= delayed_timestamp_size = resque.delayed_timestamp_size(timestamp) %></td>
-      <% job = resque.delayed_timestamp_peek(timestamp, 0, 1).first %>
+
       <td>
         <% if job && delayed_timestamp_size == 1 %>
           <%= h(job['class']) %>
