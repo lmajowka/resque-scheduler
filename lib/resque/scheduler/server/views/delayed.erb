@@ -37,7 +37,7 @@
           <input name="new_timestamp" id="ts<%= timestamp.to_i %>" style="display:none" type="text" value="<%= format_time(Time.at(timestamp)) %>"/>
           <input type="hidden" name="timestamp" value="<%= timestamp.to_i %>">
           <% if job %>
-          <input type="hidden" name="args" value="<%= Resque.encode job['args'] %>">
+          <input type="hidden" name="args" id="new_args<%= timestamp.to_i %>" value="<%= Resque.encode job['args'] %>">
           <input type="hidden" name="klass" value="<%= job['class'] %>">
           <% end %>
           <input type="hidden" name="new_args" id="new_args" value="<%= timestamp.to_i %>">
@@ -54,7 +54,7 @@
       </td>
       <td>
         <%= h(job['args'].inspect) if job && delayed_timestamp_size == 1 %>
-        <textarea name="new_args" id="args<%= timestamp.to_i %>"  style="display:none;width:100%"><%=job['args']%></textarea>
+        <textarea id="args<%= timestamp.to_i %>"  style="display:none;width:100%"><%=job['args']%></textarea>
 
       </td>
       <td>
