@@ -26,10 +26,20 @@
       <td>
         <form action="<%= u "/delayed/queue_now" %>" method="post">
           <input type="hidden" name="timestamp" value="<%= timestamp.to_i %>">
+          <input type="button" value="Edit" id="edit<%= timestamp.to_i %>" onclick="showEditFields(<%= timestamp.to_i %>)">
           <input type="submit" value="Queue now">
         </form>
       </td>
-      <td><a href="<%= u "delayed/#{timestamp}" %>"><%= format_time(Time.at(timestamp)) %></a></td>
+      <td>
+        <form action="<%= u "/delayed/edit" %>" id="edit-form" method="post">
+          <a href="<%= u "delayed/#{timestamp}" %>"><%= format_time(Time.at(timestamp)) %></a>
+          <input name="new_timestamp" id="ts<%= timestamp.to_i %>" style="display:none" type="text" value="<%= format_time(Time.at(timestamp)) %>"/>
+          <input type="hidden" name="timestamp" value="<%= timestamp.to_i %>">
+          <input type="hidden" name="args" value="<%= Resque.encode job['args'] %>">
+          <input type="hidden" name="klass" value="<%= job['class'] %>">
+          <input type="hidden" name="new_args" id="new_args" value="<%= timestamp.to_i %>">
+        </form>
+      </td>
       <td><%= delayed_timestamp_size = resque.delayed_timestamp_size(timestamp) %></td>
       <% job = resque.delayed_timestamp_peek(timestamp, 0, 1).first %>
       <td>
@@ -39,7 +49,11 @@
           <a href="<%= u "delayed/#{timestamp}" %>">see details</a>
         <% end %>
       </td>
-      <td><%= h(job['args'].inspect) if job && delayed_timestamp_size == 1 %></td>
+      <td>
+        <%= h(job['args'].inspect) if job && delayed_timestamp_size == 1 %>
+        <textarea name="new_args" id="args<%= timestamp.to_i %>"  style="display:none;width:100%"><%=job['args']%></textarea>
+
+      </td>
       <td>
         <% if job %>
           <a href="<%=u URI("/delayed/jobs/#{job['class']}?args=" + URI.encode(job['args'].to_json)) %>">All schedules</a>
@@ -56,4 +70,19 @@
   </form>
 <% end %>
 
+
+
 <%= partial :next_more, :start => start, :size => size %>
+
+<script>
+  function showEditFields(ts){
+    if (document.getElementById("edit"+ts).value == "Edit") {
+      document.getElementById("ts" + ts).style.display = "block";
+      document.getElementById("args" + ts).style.display = "block";
+      document.getElementById("edit" + ts).value = "Save";
+    } else {
+      document.getElementById("new_args" + ts).value = document.getElementById("args" + ts)
+      document.getElementById("edit-form").submit();
+    }
+  }
+</script>
