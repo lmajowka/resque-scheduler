@@ -27,6 +27,7 @@ module Resque
           post('/delayed/search') { delayed_search }
           get('/delayed/:timestamp') { delayed_timestamp }
           post('/delayed/queue_now') { delayed_queue_now }
+          post('/delayed/edit') { delayed_edit }
           post('/delayed/cancel_now') { delayed_cancel_now }
           post('/delayed/clear') { delayed_clear }
         end
@@ -108,6 +109,15 @@ module Resque
             Resque::Scheduler.enqueue_delayed_items_for_timestamp(timestamp)
           end
           redirect u('/overview')
+        end
+
+        def delayed_edit
+          timestamp = params['timestamp'].to_i
+          klass = Resque::Scheduler::Util.constantize(params['klass'])
+          args = Resque.decode params['args']
+          new_timestsamp = params['new_timestamp'].to_i
+          new_args = params['new_args'].to_i
+          Resque.remove_delayed_job_from_timestamp(timestamp, klass, *args)
         end
 
         def delayed_cancel_now
