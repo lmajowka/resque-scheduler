@@ -13,7 +13,7 @@ module Resque
       def enqueue_at(timestamp, klass, *args)
         validate(klass)
         enqueue_at_with_queue(
-          queue_from_class(klass), timestamp, klass, *args
+            queue_from_class(klass), timestamp, klass, *args
         )
       end
 
@@ -198,6 +198,17 @@ module Resque
         count
       end
 
+      def remove_delayed_job_from_timestamp_with_queue(queue,timestamp, klass, *args)
+        key = "delayed:#{timestamp.to_i}"
+        encoded_job = encode(job_to_hash_with_queue(queue,klass, args))
+
+        redis.srem("timestamps:#{encoded_job}", key)
+        count = redis.lrem(key, 0, encoded_job)
+        clean_up_timestamp(key, timestamp)
+
+        count
+      end
+
       def count_all_scheduled_jobs
         total_jobs = 0
         Array(redis.zrange(:delayed_queue_schedule, 0, -1)).each do |ts|
@@ -276,8 +287,8 @@ module Resque
         stop_at = stop_at.nil? ? '+inf' : stop_at.to_i
 
         items = redis.zrangebyscore(
-          :delayed_queue_schedule, start_at, stop_at,
-          limit: [0, 1]
+            :delayed_queue_schedule, start_at, stop_at,
+            limit: [0, 1]
         )
         timestamp = items.nil? ? nil : Array(items).first
         timestamp.to_i unless timestamp.nil?
