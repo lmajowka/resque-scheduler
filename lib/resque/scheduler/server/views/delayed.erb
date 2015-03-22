@@ -26,7 +26,6 @@
       <td>
         <form action="<%= u "/delayed/queue_now" %>" method="post">
           <input type="hidden" name="timestamp" value="<%= timestamp.to_i %>">
-          <input type="button" value="Edit" id="edit<%= timestamp.to_i %>" onclick="showEditFields(<%= timestamp.to_i %>)">
           <input type="submit" value="Queue now">
         </form>
       </td>
@@ -77,15 +76,3 @@
 
 <%= partial :next_more, :start => start, :size => size %>
 
-<script>
-  function showEditFields(ts){
-    if (document.getElementById("edit"+ts).value == "Edit") {
-      document.getElementById("ts" + ts).style.display = "block";
-      document.getElementById("args" + ts).style.display = "block";
-      document.getElementById("edit" + ts).value = "Save";
-    } else {
-      document.getElementById("new_args" + ts).value = document.getElementById("args" + ts).value
-      document.getElementById("edit-form").submit();
-    }
-  }
-</script>
