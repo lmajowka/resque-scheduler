@@ -26,6 +26,7 @@
       <td>
         <form action="<%= u "/delayed/queue_now" %>" method="post">
           <input type="hidden" name="timestamp" value="<%= timestamp.to_i %>">
+          <input type="button" value="Edit" id="edit<%= timestamp.to_i %>" onclick="showEditFields(<%= timestamp.to_i %>)">
           <input type="submit" value="Queue now">
         </form>
       </td>
