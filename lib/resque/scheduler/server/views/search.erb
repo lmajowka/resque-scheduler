@@ -33,6 +33,7 @@
         <form action="<%= u "/delayed/edit" %>" method="post" id="edit-form<%= job['timestamp'].to_i %>">
           <input type="hidden" name="timestamp" value="<%= job['timestamp'].to_i %>" id="timestamp<%= job['timestamp'].to_i %>">
           <input type="hidden" name="new_timestamp" value="" id="new-timestamp<%= job['timestamp'].to_i %>">
+          <input type="hidden" name="new_args" value="" id="new-args<%= job['timestamp'].to_i %>">
           <input type="hidden" name="klass" value="<%= job['class'] %>">
           <input type="hidden" name="queue" value="<%= job['queue'] %>">
           <input type="hidden" name="args" value='<%= job['args'].to_json.gsub('=>',':') %>'>
@@ -45,7 +46,12 @@
         <input name="new_timestamp" id="ts<%= job['timestamp'].to_i %>" style="display:none" type="text" value="<%= Time.at(job['timestamp']) %>"/>
       </td>
       <td class='class'><%= job['class'] %></td>
-      <td class='args'><%= h job['args'].inspect %></td>
+      <td class='args'>
+        <%= h job['args'].inspect %>
+        <textarea style="width:300px;height:200px;display:none" id="na<%= job['timestamp'].to_i %>">
+          <%= h job['args'].to_json.gsub('=>',':') %>
+        </textarea>
+      </td>
     </tr>
   <% end %>
 </table>
@@ -90,11 +96,12 @@
     document.getElementById("ts" + ts).style.display = "";
     document.getElementById("edit" + ts).style.display = "none";
     document.getElementById("save" + ts).style.display = "";
-//     document.getElementById("args" + ts).style.display = "";
+    document.getElementById("na" + ts).style.display = "";
   }
 
   function save(ts){
     document.getElementById("new-timestamp" + ts).value = document.getElementById("ts" + ts).value
+    document.getElementById("new-args" + ts).value = document.getElementById("na" + ts).value
     document.getElementById("edit-form" + ts).submit();
   }
 </script>
