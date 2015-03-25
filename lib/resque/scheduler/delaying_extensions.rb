@@ -259,7 +259,12 @@ module Resque
           timestamps.each do |key|
             redis.lrem(key, 0, encoded_job)
             redis.srem("timestamps:#{encoded_job}", key)
+            clean_up_timestamp("delayed:#{key}",key)
           end
+        end
+
+        timestamps.each do |key|
+          clean_up_timestamp(key,key.split(':').last)
         end
 
         return 0 if replies.nil? || replies.empty?
