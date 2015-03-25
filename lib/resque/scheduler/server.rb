@@ -113,6 +113,7 @@ module Resque
 
         def delayed_edit
           klass, timestamp, args, queue = delayed_action_common_variables
+          new_timestamp = params['new_timestamp']
           new_args = params['new_args'].to_i
           remove_with_queue(queue,timestamp, klass, *args)
           Resque.enqueue_at_with_queue(params[:queue],new_timestamp,klass,*args)
