@@ -112,27 +112,33 @@ module Resque
         end
 
         def delayed_edit
-          timestamp = params['timestamp']
-          klass = Resque::Scheduler::Util.constantize(params['klass'])
-          args = Resque.decode params['args']
-          new_timestamp = params['new_timestamp']
+          klass, timestamp, args, queue = delayed_action_common_variables
           new_args = params['new_args'].to_i
-          Resque.remove_delayed_job_from_timestamp(timestamp, klass, *args)
+          remove_with_queue(queue,timestamp, klass, *args)
           Resque.enqueue_at_with_queue(params[:queue],new_timestamp,klass,*args)
           redirect u('/delayed')
         end
 
         def delayed_cancel_now
-          klass = Resque::Scheduler::Util.constantize(params['klass'])
-          timestamp = params['timestamp']
-          args = Resque.decode params['args']
-          queue = params[:queue]
+          klass, timestamp, args, queue = delayed_action_common_variables
+          remove_with_queue(queue,timestamp, klass, *args)
+          redirect u('/delayed')
+        end
+
+        def remove_with_queue(queue,timestamp, klass, *args)
           if queue
             Resque.remove_delayed_job_from_timestamp_with_queue(queue,timestamp, klass, *args)
           else
             Resque.remove_delayed_job_from_timestamp(timestamp, klass, *args)
           end
-          redirect u('/delayed')
+        end
+
+        def delayed_action_common_variables
+          klass = Resque::Scheduler::Util.constantize(params['klass'])
+          timestamp = params['timestamp']
+          args = Resque.decode params['args']
+          queue = params[:queue]
+          return klass, timestamp, args, queue
         end
 
         def delayed_clear
