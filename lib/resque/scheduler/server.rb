@@ -95,7 +95,7 @@ module Resque
         end
 
         def delayed_search
-          @jobs = find_job(params[:search])
+          @jobs = find_job(params[:search],params[:priority],params[:user_id])
           erb scheduler_template('search')
         end
 
@@ -159,14 +159,15 @@ module Resque
           )
         end
 
-        def find_job(worker)
+        def find_job(worker, priority, user_id)
           worker = worker.downcase
           results = working_jobs_for_worker(worker)
 
           dels = delayed_jobs_for_worker(worker)
           results += dels.select do |j|
-            j['class'].downcase.include?(worker) &&
-                j.merge!('where_at' => 'delayed')
+            if  ( (j['class'].downcase.include?(worker) && worker != "" )|| j['args'][0]['user_id'].to_s == user_id || j['args'][0]['priority'].to_s == priority )
+              j.merge!('where_at' => 'delayed')
+            end
           end
 
           Resque.queues.each do |queue|
