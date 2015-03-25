@@ -42,7 +42,7 @@
       </td>
       <td class='args'>
         <%= format_time(Time.at(job['timestamp'])) %>
-        <input name="new_timestamp" id="ts<%= job['timestamp'].to_i %>" style="display:none" type="text" value="<%= job['timestamp'].to_i %>"/>
+        <input name="new_timestamp" id="ts<%= job['timestamp'].to_i %>" style="display:none" type="text" value="<%= Time.at(job['timestamp']) %>"/>
       </td>
       <td class='class'><%= job['class'] %></td>
       <td class='args'><%= h job['args'].inspect %></td>
