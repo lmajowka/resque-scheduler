@@ -68,10 +68,18 @@
 <% if size > 0 %>
   <br>
   <form method="POST" id="clear-delayed-form" action="<%=u 'delayed/clear'%>" class='clear-delayed'>
-    <input type='submit' name='' value='Clear Delayed Jobs' />
+    <input type='button' name='' value='Clear Delayed Jobs' onclick="confirm_delete_all()"/>
   </form>
 <% end %>
 
+<script>
+  function confirm_delete_all(){
+    var c = confirm("Are you sure madafoca?");
+    if (c){
+      document.getElementById('clear-delayed-form').submit();
+    }
+  }
+</script>
 
 
 <%= partial :next_more, :start => start, :size => size %>
